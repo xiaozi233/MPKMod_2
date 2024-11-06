@@ -26,6 +26,7 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Matrix4f;
+import net.minecraft.util.registry.Registry;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
@@ -83,7 +84,9 @@ public class FunctionCompatibility implements FunctionHolder,
         if (MinecraftClient.getInstance().world == null)
             return null;
 
-        return MinecraftClient.getInstance().world.getBlockState(blockpos).getBlock().toString();
+        return Registry.BLOCK.getKey(
+                MinecraftClient.getInstance().world.getBlockState(blockpos).getBlock()
+        ).get().getValue().toString();
     }
 
     @Override
@@ -109,7 +112,9 @@ public class FunctionCompatibility implements FunctionHolder,
 
         HitResult hitResult = MinecraftClient.getInstance().getCameraEntity().raycast(20, 0, false);
         if (hitResult.getType() == HitResult.Type.BLOCK && MinecraftClient.getInstance().world != null) {
-            return MinecraftClient.getInstance().world.getBlockState(((BlockHitResult) hitResult).getBlockPos()).getBlock().toString();
+            return Registry.BLOCK.getKey(
+                    MinecraftClient.getInstance().world.getBlockState(((BlockHitResult) hitResult).getBlockPos()).getBlock()
+            ).get().getValue().toString();
         }
         return null;
     }

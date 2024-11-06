@@ -7,13 +7,13 @@ import io.github.kurrycat.mpkmod.util.Vector2D;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 
 public class MPKGuiScreen extends Screen {
     public io.github.kurrycat.mpkmod.gui.MPKGuiScreen eventReceiver;
 
     public MPKGuiScreen(io.github.kurrycat.mpkmod.gui.MPKGuiScreen screen) {
-        super(Text.of(API.MODID + ".gui.title"));
+        super(new TranslatableText(API.MODID + ".gui.title"));
         eventReceiver = screen;
     }
 
