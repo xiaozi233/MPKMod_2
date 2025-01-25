@@ -1,14 +1,20 @@
 package io.github.kurrycat.mpkmod.compatibility.fabric_1_18_2;
 
 import io.github.kurrycat.mpkmod.compatibility.API;
+import io.github.kurrycat.mpknetapi.common.MPKNetworking;
+import io.github.kurrycat.mpknetapi.common.network.packet.MPKPacket;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.MinecraftClient;
 import io.github.kurrycat.mpkmod.compatibility.MCClasses.KeyBinding;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.InvalidIdentifierException;
+import net.minecraft.util.Util;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,6 +23,15 @@ public class MPKMod implements ModInitializer {
 	public static Map<String, net.minecraft.client.option.KeyBinding> keyBindingMap = new HashMap<>();
 	public static final MPKMod INSTANCE = new MPKMod();
 	public final EventHandler eventHandler = new EventHandler();
+	public static final Identifier NETWORKING_IDENTIFIER = Util.make(
+			() -> {
+				try {
+					return new Identifier(MPKNetworking.CHANNEL_NAMESPACE, MPKNetworking.CHANNEL_PATH);
+				} catch (InvalidIdentifierException var3) {
+					return null;
+				}
+			}
+	);
 
 	@Override
 	public void onInitialize() {
@@ -31,6 +46,13 @@ public class MPKMod implements ModInitializer {
 		ClientTickEvents.END_CLIENT_TICK.register(eventHandler::onClientTickEnd);
 		ClientPlayConnectionEvents.JOIN.register(eventHandler::onServerConnect);
 		ClientPlayConnectionEvents.DISCONNECT.register(eventHandler::onServerDisconnect);
+
+		ClientPlayNetworking.registerGlobalReceiver(NETWORKING_IDENTIFIER, ((client, handler, buf, responseSender) -> {
+			MPKPacket packet = MPKPacket.handle(API.PACKET_LISTENER_CLIENT, buf.array(), null);
+			if (packet != null) {
+				API.Events.onPluginMessage(packet);
+			}
+		}));
 	}
 
 	public void init() {

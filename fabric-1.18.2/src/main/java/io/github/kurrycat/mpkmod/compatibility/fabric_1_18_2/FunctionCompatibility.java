@@ -8,6 +8,9 @@ import io.github.kurrycat.mpkmod.util.BoundingBox3D;
 import io.github.kurrycat.mpkmod.util.Debug;
 import io.github.kurrycat.mpkmod.util.Vector2D;
 import io.github.kurrycat.mpkmod.util.Vector3D;
+import io.github.kurrycat.mpknetapi.common.network.packet.MPKPacket;
+import io.netty.buffer.Unpooled;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
@@ -19,6 +22,7 @@ import net.minecraft.client.render.*;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.util.Window;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Util;
 import net.minecraft.util.hit.BlockHitResult;
@@ -392,6 +396,10 @@ public class FunctionCompatibility implements FunctionHolder,
             KeyBinding.onKeyPressed(((KeyBindingAccessor) op.useKey).getBoundKey());
 
         return true;
+    }
+
+    public void sendPacket(MPKPacket packet) {
+        ClientPlayNetworking.send(MPKMod.NETWORKING_IDENTIFIER, new PacketByteBuf(Unpooled.wrappedBuffer(packet.getData())));
     }
 
     public boolean isF3Enabled() {
